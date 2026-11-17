@@ -118,3 +118,12 @@ Added `tools/dreamlite_onnx/export_mobile.py` and its README. The script loads t
 With `--validate`, it checks each exported graph with ONNX Runtime CPU against the same PyTorch module and writes `export_report.json`.
 
 **This is code added, not a successful model export.** The export script has not yet been run because model weights and a compatible Python/PyTorch/ONNX environment are not present in this GitHub-only session. The Qwen3-VL encoder remains a separate blocker; these three graphs alone cannot perform an image edit.
+
+## Export harness verification (2026-11-17)
+
+- Added four automated tests covering VAE/UNet wrapper tensor contracts and an actual tiny-model ONNX export → ONNX Runtime CPU round-trip.
+- The ONNX round-trip test also runs a second sequence length, confirming the exported sequence axis is dynamic for the test graph.
+- GitHub Actions passed on the feature branch: [run 44042470524](https://github.com/tensor004/Repix/actions/runs/44042470524).
+- Export now keeps Qwen3-VL on CPU and moves only the VAE and UNet to the selected export device, avoiding unnecessary Qwen encoder VRAM use.
+
+**Scope of the green CI:** these are synthetic wrapper/ONNX smoke tests. They do not load DreamLite weights or prove the real UNet/VAE export succeeds. The next gate is a real export with the licensed DreamLite-Mobile weights, followed by QNN/device validation. No model weights have been downloaded or redistributed.
