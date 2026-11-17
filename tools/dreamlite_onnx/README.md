@@ -4,10 +4,13 @@ This is a desktop export and CPU-parity harness, not Android integration. It exp
 
 ## Environment
 
-Use Python 3.10 and the DreamLite repository's main implementation/weight branch. Install its requirements, then:
+Use Python 3.10 or 3.11. Clone the official DreamLite source repository and install its requirements plus the export dependencies:
 
 \`\`\`bash
-pip install onnx onnxruntime
+git clone https://github.com/ByteVisionLab/DreamLite.git
+cd DreamLite
+pip install -r requirements.txt
+pip install onnx onnxruntime huggingface_hub
 hf download carlofkl/DreamLite-mobile --revision main --local-dir models/DreamLite-mobile
 \`\`\`
 
@@ -15,7 +18,7 @@ Review DreamLite's WEIGHTS_LICENSE and the Hugging Face model terms before downl
 
 ## Run
 
-From the DreamLite source repository root, after placing this folder under tools/dreamlite_onnx/:
+From the DreamLite source repository root, copy the RePix exporter folder into tools/dreamlite_onnx/ (or run it from a checkout where that path exists):
 
 \`\`\`bash
 python tools/dreamlite_onnx/export_mobile.py --model-id models/DreamLite-mobile --output-dir artifacts/dreamlite-onnx --device cpu --validate
