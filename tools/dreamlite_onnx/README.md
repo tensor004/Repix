@@ -8,7 +8,10 @@ Use Python 3.10 or 3.11. Clone the official DreamLite source repository and inst
 
 \`\`\`bash
 git clone https://github.com/ByteVisionLab/DreamLite.git
+git clone -b feature/dreamlite-android-integration https://github.com/tensor004/Repix.git
 cd DreamLite
+mkdir -p tools/dreamlite_onnx
+cp -r ../Repix/tools/dreamlite_onnx/. tools/dreamlite_onnx/
 pip install -r requirements.txt
 pip install onnx onnxruntime huggingface_hub
 hf download carlofkl/DreamLite-mobile --revision main --local-dir models/DreamLite-mobile
