@@ -69,3 +69,40 @@ On the target Android phone, select a local photograph and submit: “Change the
 - [ ] Add production Flutter UI, model management, and tests.
 
 No functional DreamLite inference code is claimed at this stage. The next implementation commit should follow a successful Android encoder/runtime spike, not introduce a nonfunctional placeholder.
+
+## Follow-up source-level deployment audit (2026-11-17)
+
+A closer audit of the official `deploy/` sources narrows the Android porting work:
+
+- The upstream deployment guide explicitly targets **iOS / Swift / Core ML**. It is not a portable mobile runtime package.
+- The provided UNet exporter is Core ML-specific and traces a wrapper with inputs:
+  - `sample [1, 4, 128, 256]`
+  - `timestep [1]`
+  - `encoder_hidden_states [1, 77, 2048]` (77 is only the export example/default)
+  - `encoder_attention_mask [1, 77]`
+  - `time_ids [1, 2]`
+  The exporter allows sequence lengths 10–512 in Core ML, so an Android export must preserve dynamic sequence handling or deliberately prove a safe fixed-length strategy.
+- The VAE exporter contracts are explicit: image `[1,3,1024,1024]` to latent `[1,4,128,128]`, and the reverse for decoding. These are useful parity targets for an ONNX export.
+- The official Qwen3-VL patch adds `getHiddenStatesWithImage(inputIds:pixelValues:imageGridTHW:)`. It runs the vision model, merges image features into token embeddings, then runs the language layers and returns hidden states. This confirms the critical encoder output is not a standard generated answer; it is a tensor produced by a custom model-internal path.
+- The official UNet exporter uses Core ML conversion with FP16 and an iOS deployment target. It does not provide an ONNX/QNN export recipe.
+
+### Updated engineering decision
+
+Do **not** add a pretend Android inference class or wire a nonfunctional editor UI yet. The next useful implementation artifact is an export/parity spike outside the Android app:
+
+1. Reproduce the official PyTorch outputs for VAE encoder, VAE decoder, and UNet with saved test tensors.
+2. Export those modules to ONNX with named inputs and dynamic axes where required.
+3. Run ONNX Runtime CPU validation first, then attempt Qualcomm QNN compilation on a supported Snapdragon device.
+4. Separately port the exact Qwen3-VL image-conditioned hidden-state method to an Android-capable runtime. A text-only embedding or chat completion is not an acceptable substitute.
+5. Compare tensor shapes and numerical error against the official Python pipeline before connecting Flutter.
+
+### Current implementation status
+
+- [x] Inspected the exact upstream Core ML export scripts and their tensor contracts.
+- [x] Located the custom Qwen3-VL image-conditioned hidden-state method and confirmed why ordinary chat inference is insufficient.
+- [ ] Android ONNX export/parity harness.
+- [ ] QNN compilation and device execution.
+- [ ] Android Qwen3-VL hidden-state extraction.
+- [ ] End-to-end offline edit on the Nothing Phone (3a Pro).
+
+This audit is source inspection only. No Android model has been exported, compiled, or run yet.
