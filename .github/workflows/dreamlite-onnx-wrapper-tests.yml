@@ -31,7 +31,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
           python -m pip install numpy onnx onnxruntime
-      - name: Compile exporter
-        run: python -m py_compile tools/dreamlite_onnx/export_mobile.py tools/dreamlite_onnx/test_export_mobile.py
+      - name: Compile exporter and validate Colab notebook JSON
+        run: |
+          python -m py_compile tools/dreamlite_onnx/export_mobile.py tools/dreamlite_onnx/test_export_mobile.py
+          python -c "import json; json.load(open('tools/dreamlite_onnx/RePix_DreamLite_ONNX_Export.ipynb'))"
       - name: Run wrapper and ONNX parity tests
         run: python -m unittest discover -s tools/dreamlite_onnx -p "test_*.py" -v
