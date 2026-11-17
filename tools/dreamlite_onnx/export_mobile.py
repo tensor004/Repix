@@ -85,11 +85,14 @@ def main():
 
     from dreamlite import DreamLiteMobilePipeline
     print(f"Loading {args.model_id} on {device} (FP32 export baseline)...", flush=True)
+    # Keep the large Qwen3-VL encoder on CPU: this spike exports only VAE/UNet.
+    # Moving the whole pipeline to CUDA needlessly consumes several GB of VRAM.
     pipe = DreamLiteMobilePipeline.from_pretrained(
         args.model_id, torch_dtype=torch.float32
-    ).to(device)
+    )
     pipe.set_progress_bar_config(disable=True)
-    vae, unet = pipe.vae.eval(), pipe.unet.eval()
+    vae = pipe.vae.to(device).eval()
+    unet = pipe.unet.to(device).eval()
     for model in (vae, unet):
         for parameter in model.parameters():
             parameter.requires_grad_(False)
