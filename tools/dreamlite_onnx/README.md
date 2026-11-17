@@ -14,7 +14,15 @@ mkdir -p tools/dreamlite_onnx
 cp -r ../Repix/tools/dreamlite_onnx/. tools/dreamlite_onnx/
 pip install -r requirements.txt
 pip install onnx onnxruntime huggingface_hub
-hf download carlofkl/DreamLite-mobile --revision main --local-dir models/DreamLite-mobile
+python - <<'PY'
+from huggingface_hub import snapshot_download
+snapshot_download(
+    repo_id="carlofkl/DreamLite-mobile",
+    revision="main",
+    allow_patterns=["unet/*", "vae/*"],
+    local_dir="models/DreamLite-mobile",
+)
+PY
 \`\`\`
 
 Review DreamLite's WEIGHTS_LICENSE and the Hugging Face model terms before downloading or using weights.
