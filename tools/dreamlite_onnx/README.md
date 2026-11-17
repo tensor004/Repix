@@ -54,3 +54,11 @@ The UNet sequence axis is dynamic. L=200 is only the export/parity example input
 - Zero-valued smoke-test tensors are used for export. A later parity stage must test representative non-zero images/latents, preprocessing, latent scaling, and scheduler behavior.
 - FP32 is a correctness baseline. QNN deployment needs a separate FP16/quantization and operator-support pass.
 - No model weights are included in RePix.
+
+## Phone-friendly export option
+
+A Google Colab notebook is included for the real weight export. Open it in Colab, select a T4 GPU runtime, run the cells in order, and keep the resulting ZIP private:
+
+[Open RePix DreamLite ONNX export notebook in Google Colab](https://colab.research.google.com/github/tensor004/Repix/blob/feature/dreamlite-android-integration/tools/dreamlite_onnx/RePix_DreamLite_ONNX_Export.ipynb)
+
+Colab is used only for this one-time model conversion and validation. The exported ONNX graphs are intended for later offline Android deployment. A free GPU runtime is not guaranteed; if unavailable, the export must be run on another CUDA-capable computer.
