@@ -38,7 +38,7 @@ Flutter editor UI
                     └── VAE decoder + output image
 ```
 
-The Android runtime must be a distinct implementation. Candidate inference paths to evaluate are ONNX Runtime with a supported Android execution provider, Qualcomm QNN where the exact operator graph can be compiled, or another Android-native runtime proven to support the exported operators. Do not select a runtime based only on general GPU support claims.
+The Android runtime must be a distinct implementation. Two useful leads exist, but neither proves DreamLite compatibility yet:\n\n- ONNX Runtime now documents Android ARM64 support for its Qualcomm QNN execution provider through a Maven artifact. This gives us a real Snapdragon NPU route to investigate, but every exported DreamLite graph must still pass QNN operator/shape compilation and device validation.\n- Qualcomm's Android GenieX examples list Qwen3-VL 2B VLM support on Snapdragon devices, and Qwen3-VL 2B can also run through llama.cpp on Android CPU. However, DreamLite needs the encoder's image-conditioned hidden-state tensor, not a normal chat completion. The iOS reference explicitly modifies the VLM implementation to expose hidden states. We must prove an Android runtime can expose equivalent tensors before treating this as a solution.\n\nThe preferred spike is therefore: first test whether an Android Qwen3-VL implementation can return the exact image+instruction hidden-state tensor DreamLite expects; in parallel, export a minimal DreamLite UNet/VAE graph and test ONNX Runtime/QNN compilation. Do not select a runtime based only on general GPU support claims.
 
 ## Android feasibility gates
 
