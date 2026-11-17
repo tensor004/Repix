@@ -1,6 +1,6 @@
 # DreamLite-Mobile ONNX export spike
 
-This is a desktop export and CPU-parity harness, not Android integration. It exports the official DreamLite-Mobile UNet and TinyVAE as separate ONNX graphs. FP32 is deliberate: establish correctness before attempting FP16 conversion or Qualcomm QNN compilation.
+This is a desktop export and CPU-parity harness, not Android integration. It loads only the official DreamLite-Mobile UNet and TinyVAE subfolders, then exports them as separate ONNX graphs. It deliberately does not load the Qwen3-VL encoder. FP32 is the correctness baseline before FP16 conversion or Qualcomm QNN compilation.
 
 ## Environment
 
@@ -41,7 +41,7 @@ The UNet sequence axis is dynamic. L=200 is only the export/parity example input
 
 ## Limitations
 
-- The text/image encoder is not exported. Editing requires Qwen3-VL's image-conditioned final hidden-state tensor, not generated chat text.
+- The text/image encoder is not loaded or exported. Editing still requires Qwen3-VL's image-conditioned final hidden-state tensor, not generated chat text. This is intentionally the next independent export/runtime task.
 - This validates exported graphs against PyTorch on the same desktop. It does not establish QNN support, Android performance, memory use, or Nothing Phone 3a Pro compatibility.
 - Zero-valued smoke-test tensors are used for export. A later parity stage must test representative non-zero images/latents, preprocessing, latent scaling, and scheduler behavior.
 - FP32 is a correctness baseline. QNN deployment needs a separate FP16/quantization and operator-support pass.
