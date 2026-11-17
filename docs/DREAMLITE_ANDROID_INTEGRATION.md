@@ -127,3 +127,19 @@ With `--validate`, it checks each exported graph with ONNX Runtime CPU against t
 - Export now keeps Qwen3-VL on CPU and moves only the VAE and UNet to the selected export device, avoiding unnecessary Qwen encoder VRAM use.
 
 **Scope of the green CI:** these are synthetic wrapper/ONNX smoke tests. They do not load DreamLite weights or prove the real UNet/VAE export succeeds. The next gate is a real export with the licensed DreamLite-Mobile weights, followed by QNN/device validation. No model weights have been downloaded or redistributed.
+
+## Current handoff point (2026-11-17)
+
+The exporter now loads only the `unet/` and `vae/` component folders directly. It does not instantiate or download Qwen3-VL for this stage. The README includes a selective weight download and a Google Colab notebook is available at:
+
+`tools/dreamlite_onnx/RePix_DreamLite_ONNX_Export.ipynb`
+
+The notebook clones the two source repositories, installs pinned dependencies without replacing Colab's CUDA PyTorch, downloads only the UNet/VAE weights, runs the FP32 export and ONNX Runtime CPU parity checks, then packages the result privately for download.
+
+**Automated checks passed:** wrapper shape tests plus a real tiny-model ONNX export/ORT round-trip, including a second dynamic sequence length. These are smoke tests with synthetic modules, not a real DreamLite weight export.
+
+### External step now required
+
+The next step needs a GPU runtime and the actual DreamLite-Mobile weights. I cannot sign in to the user's Colab account, accept model terms on their behalf, or access their private runtime/storage. The user must review the CC BY-NC 4.0/non-commercial restrictions, open the notebook, select a T4 GPU if available, and run it. Keep the exported model ZIP private. Once the notebook produces `export_report.json`, its report or failure output is enough to continue engineering here.
+
+After that handoff, remaining work is Qwen3-VL image-conditioned hidden-state extraction, QNN conversion/compilation, and on-device execution. No Android APK is claimed.
