@@ -106,3 +106,15 @@ Do **not** add a pretend Android inference class or wire a nonfunctional editor 
 - [ ] End-to-end offline edit on the Nothing Phone (3a Pro).
 
 This audit is source inspection only. No Android model has been exported, compiled, or run yet.
+
+## ONNX export spike added (2026-11-17)
+
+Added `tools/dreamlite_onnx/export_mobile.py` and its README. The script loads the official DreamLite-Mobile pipeline and exports three separate FP32 ONNX graphs:
+
+- TinyVAE encoder: RGB image to latent.
+- TinyVAE decoder: latent to RGB image.
+- Mobile UNet: in-context latent plus Qwen hidden-state conditioning, with a dynamic sequence axis.
+
+With `--validate`, it checks each exported graph with ONNX Runtime CPU against the same PyTorch module and writes `export_report.json`.
+
+**This is code added, not a successful model export.** The export script has not yet been run because model weights and a compatible Python/PyTorch/ONNX environment are not present in this GitHub-only session. The Qwen3-VL encoder remains a separate blocker; these three graphs alone cannot perform an image edit.
